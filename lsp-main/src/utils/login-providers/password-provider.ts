@@ -1,8 +1,20 @@
 import AuthenticationProvider from "./authentication-provider";
+import { PasswordCredentials } from "./credentials";
 import UserSession from "./user-session";
 
 export default class PasswordProvider implements AuthenticationProvider {
-  login(email: string, password: string): Promise<UserSession> {
+  canHandle(credentials: object): boolean {
+    return 'email' in credentials && 'password' in credentials;
+  }
+
+  login(credentials: object): Promise<UserSession> {
+    const isValid = this.canHandle(credentials);
+    if (!isValid) {
+      return Promise.reject(new Error("Invalid credentials for PasswordProvider"));
+    }
+    
+    const { email, password } = credentials as PasswordCredentials;
+
     console.log("User logged in with email:", email);
     console.log("Password used:", password);
 
